@@ -1,0 +1,586 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <conio.h>
+#include <malloc.h>
+#include <locale.h>
+#include <windows.h>
+
+struct Node
+{
+	struct Node* pPrevious;
+	struct Node* pNext;
+	char* question;
+	int number;
+	int value;
+};
+
+struct list
+{
+	struct Node* tail;
+	struct Node* head;
+	int size;
+};
+
+struct list pushFront(struct list a, char* question, int number, int value)
+{
+	if (a.size == 0)
+	{
+		a.head = a.tail = (struct Node*)malloc(sizeof(struct Node));
+		if (a.head == NULL)
+		{
+			printf("Error");
+			exit(0);
+		}
+		a.head->value = a.tail->value = value;
+		a.head->question = a.tail->question = question;
+		a.head->number = a.tail->number = number;
+		a.head->pNext = a.head->pPrevious = a.tail->pNext = a.tail->pPrevious = NULL;
+	}
+	else
+	{
+		struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+		if (temp == NULL)
+		{
+			printf("Error");
+			exit(0);
+		}
+		temp->pNext = a.head;
+		temp->pPrevious = NULL;
+		temp->value = value;
+		temp->number = number;
+		temp->question = question;
+		a.head->pPrevious = temp;
+		a.head = temp;
+		
+	}
+	a.size++;
+	return a;
+}
+
+struct list push(struct list a, char* question, int number, int value)
+{
+	if (a.size == 0)
+	{
+		a.head = a.tail = (struct Node*)malloc(sizeof(struct Node));
+		if (a.head == NULL)
+		{
+			printf("Error");
+			exit(0);
+		}
+		a.head->value = a.tail->value = value;
+		a.head->question = a.tail->question = question;
+		a.head->number = a.tail->number = number;
+		a.head->pNext = a.head->pPrevious = a.tail->pNext = a.tail->pPrevious = NULL;
+	}
+	else
+	{
+		struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+		if (temp == NULL)
+		{
+			printf("Error");
+			exit(0);
+		}
+		temp->pPrevious = a.tail;
+		temp->pNext = NULL;
+		temp->value = value;
+		temp->question = question;
+		temp->number = number;
+		a.tail->pNext = temp;
+		a.tail = temp;
+	}
+	a.size++;
+	return a;
+}
+
+struct list deleteFirst(struct list a)
+{
+	if (a.size > 0)
+	{
+		if (a.size == 1)
+		{
+			free(a.head);
+			a.head = a.tail = NULL;
+		}
+		else if (a.size == 2)
+		{
+			struct Node* temp = a.head;
+			a.tail->pPrevious = NULL;
+			a.head = a.tail;
+			free(temp);
+		}
+		else
+		{
+			struct Node* temp = a.head;
+			a.head = a.head->pNext;
+			a.head->pPrevious = NULL;
+			free(temp);
+		}
+		a.size--;
+	}
+	return a;
+}
+
+struct list deleteLast(struct list a)
+{
+	if (a.size > 0)
+	{
+		if (a.size == 1)
+		{
+			free(a.head);
+			a.head = a.tail = NULL;
+		}
+		else if (a.size == 2)
+		{
+			struct Node* temp = a.tail;
+			a.head->pNext = NULL;
+			a.tail = a.head;
+			free(temp);
+		}
+		else
+		{
+			struct Node* temp = a.tail;
+			a.tail = a.tail->pPrevious;
+			a.tail->pNext = NULL;
+			free(temp);
+		}
+		a.size--;
+	}
+	return a;
+}
+
+int getValueAt(struct list a, int num)
+{
+	struct Node* current;
+	if (num < a.size / 2)
+	{
+		current = a.head;
+		for (int i = 0; i < num; i++)
+		{
+			current = current->pNext;
+		}
+	}
+	else
+	{
+		current = a.tail;
+		for (int i = a.size - 1; i > num; i--)
+		{
+			current = current->pPrevious;
+		}
+	}
+	return current->value;
+}
+
+int getNumberAt(struct list a, int num)
+{
+	struct Node* current;
+	if (num < a.size / 2)
+	{
+		current = a.head;
+		for (int i = 0; i < num; i++)
+		{
+			current = current->pNext;
+		}
+	}
+	else
+	{
+		current = a.tail;
+		for (int i = a.size - 1; i > num; i--)
+		{
+			current = current->pPrevious;
+		}
+	}
+	return current->number;
+}
+
+struct list removeAt(struct list a, int num)
+{
+	if (num == 0)
+	{
+		a = deleteFirst(a);
+	}
+	else if (num == a.size - 1)
+		a = deleteLast(a);
+	else
+	{
+		struct Node* current;
+		if (num < a.size / 2)
+		{
+			current = a.head;
+			for (int i = 0; i < num; i++)
+			{
+				current = current->pNext;
+			}
+		}
+		else
+		{
+			current = a.tail;
+			for (int i = a.size - 1; i > num; i--)
+			{
+				current = current->pPrevious;
+			}
+		}
+		struct Node* temp = current;
+		current = current->pNext;
+		free(temp);
+		a.size--;
+	}
+	return a;
+}
+
+char* getQuestionAt(struct list a, int num)
+{
+	struct Node* current;
+	if (num < a.size / 2)
+	{
+		current = a.head;
+		for (int i = 0; i < num; i++)
+		{
+			current = current->pNext;
+		}
+	}
+	else
+	{
+		current = a.tail;
+		for (int i = a.size - 1; i > num; i--)
+		{
+			current = current->pPrevious;
+		}
+	}
+	return current->question;
+}
+
+struct list clear(struct list a)
+{
+	if (a.size > 0)
+	{
+		int temp = a.size;
+		for (int i = 0; i < temp - 1; i++)
+			a = deleteFirst(a);
+		free(a.head);
+		a.head = a.tail = NULL;
+		a.size = 0;
+	}
+	return a;
+}
+
+char* ScanString(void)
+{
+	char* str = (char*)malloc(102 * sizeof(char));
+	if (str == NULL)
+	{
+		printf("Error");
+		exit(0);
+	}
+	int checker;
+	while (1)
+	{
+		printf("Ваш ввод: ");
+		checker = scanf_s("%[^\n]", str, 100);
+		if (checker == 1)
+		{
+			while (getchar() != '\n');
+			break;
+		}
+		else
+		{
+			printf("<= 100 symbols and > 0 symbols\n");
+			while (getchar() != '\n');
+		}
+	}
+	return str;
+}
+
+int getAnswer(int max)
+{
+	int num, check;
+	while (1)
+	{
+		printf("Ваш ввод: ");
+		check = scanf_s("%d", &num);
+		if (check == 1)
+			if (num <= max && num > 0)
+			{
+				while (getchar() != '\n');
+				break;
+			}
+			else
+				printf("Нет такого варианта ввода:\n");
+		else
+			printf("Неправильный ввод\n");
+		while (getchar() != '\n');
+	}
+	return num;
+}
+
+struct list openAndRecord(struct list que)
+{
+	int flag = 0;
+
+	FILE *fp;
+	char* filename;
+	while (1)
+	{
+		printf("Введите имя файла:\n");
+		filename = ScanString();
+
+		if ((fp = fopen(filename, "r+")) != NULL)
+			break;
+
+		printf("Не удалось открыть файл\n\n1)Ввести еще раз\n2)Отмена\n\n");
+		if (getAnswer(2) == 2)
+		{
+			flag = 1;
+			break;
+		}
+	}
+
+	que = clear(que);
+
+	///////
+
+	if (!flag)
+	{
+		int i;
+		char* str = (char*)malloc(101 * sizeof(char));
+		int number;
+		int value;
+		char temp = ' ';
+
+		while (1)
+		{
+			if (fscanf(fp, "%c", &temp) != 1)
+				break;
+			number = temp - '0';
+			if (number > 9 || number < 1)
+			{
+				printf("Неправильное кол-во ответов");
+				exit(0);
+			}
+
+			fscanf(fp, "%c", &temp);
+			if (temp != ';')
+			{
+				printf("Неправильный формат");
+				exit(0);
+			}
+
+			i = 0;
+			temp = ' ';
+			while (1)
+			{
+				fscanf(fp, "%c", &temp);
+				if (temp == ';' || i == 100)
+					break;
+				str[i] = temp;
+				i++;
+			}
+			if (i == 100)
+			{
+				printf("Слишком длинный ответ");
+				exit(0);
+			}
+			for (; i < 101; i++)
+			{
+				str[i] = '\0';
+			}
+
+			fscanf(fp, "%c", &temp);
+			value = temp - '0';
+			if (value < 1 || value > number)
+			{
+				printf("Неправильный ответ");
+				exit(0);
+			}
+
+			fscanf(fp, "%c", &temp);
+			if (temp != ';')
+			{
+				printf("Неправильный формат");
+				exit(0);
+			}
+			que = pushFront(que, str, number, value);
+			if (feof(fp))
+				break;
+		}
+
+		///////
+
+		fclose(fp);
+
+		system("cls");
+		printf("Готово, вопросов обнаружено: %i.", que.size);
+		_getch();
+	}
+	return que;
+}
+
+void showAll(struct list que)
+{
+	for (int i = 0; i < que.size; i++)
+	{
+		printf("%i:\n", i+1);
+		printf("%s", getQuestionAt(que, i));
+		printf("\n");
+	}
+	if (que.size == 0)
+	{
+		printf("Пусто");
+	}
+	printf("\n");
+}
+
+void StartTesting(struct list que)
+{
+	printf("Тестирование начато");
+	_getch();
+	system("cls");
+	int result = 0;
+	for (int i = 0; i < que.size; i++)
+	{
+		printf("%s",getQuestionAt(que, i));
+		printf("\n");
+		if (getAnswer(getNumberAt(que, i)) == getValueAt(que, i))
+		{
+			result++;
+		}
+		system("cls");
+	}
+	printf("%s%i", "Ваш результат: ", result);
+	_getch();	
+}
+
+struct list EditTest(struct list que)
+{
+	int i;
+	char* str;
+	int value;
+	int number;
+	int temp;
+	while (1)
+	{
+		system("cls");
+		printf("1)Добавить вопрос\n2)Удалить вопрос\n3)Закончить редактирование\n\nВариант ввода:\n");
+		i = getAnswer(3);
+		system("cls");
+		if (i == 1)
+		{
+			printf("Введите кол-во ответов:\n");
+			number = getAnswer(9);
+			system("cls");
+			char* arr[9];
+			printf("Введите вопрос:\n");
+			str = ScanString();
+			char num[2] = "\0";
+			system("cls");
+			for (int i = 0; i < number; i++)
+			{
+				printf("Введите вариант ответа на вопрос номер %i:\n", i + 1);
+				arr[i] = ScanString();
+				str = strcat(str, "\n");
+				num[0] = i + 1 + '0';
+				str = strcat(str, num);
+				str = strcat(str, ") ");
+				str = strcat(str, arr[i]);
+				system("cls");
+			}
+
+			printf("Введите номер ответа:\n");
+			value = getAnswer(number);
+
+			que = push(que, str, number, value);
+			continue;
+		}
+		else if (i == 2)
+		{
+			showAll(que);
+			printf("%i: Отмена.", que.size + 1);
+			printf("\nВведите номер:\n");
+			temp = getAnswer(que.size + 1);
+			if (temp != que.size + 1)
+			{
+				que = removeAt(que, temp - 1);
+				system("cls");
+				printf("Готово");
+				_getch();
+			}
+			continue;
+		}
+		else if (i == 3)
+		{
+			break;
+		}
+		printf("Неправильный ввод");
+	}
+	return que;
+}
+
+void SaveTest(struct list que)
+{
+	FILE *fp;
+	char* filename;
+	while (1)
+	{
+		printf("Введите имя файла:\n");
+		filename = ScanString();
+
+		if ((fp = fopen(filename, "w+")) != NULL)
+			break;
+		printf("Не удалось открыть файл\n");
+	}
+	
+	for (int i = 0; i < que.size; i++)
+		fprintf(fp, "%i;%s;%i;", getNumberAt(que, i), getQuestionAt(que, i), getValueAt(que, i));
+
+	fclose(fp);
+
+	system("cls");
+	printf("Готово");
+	_getch();
+}
+
+void Menu(struct list que)
+{
+	int flag = 0;
+	while (1)
+	{
+		system("cls");
+		printf("1)Открыть тест из файла\n2)Редактировать тест\n3)Сохранить тест в файл\n4)Пройти тест\n5)Показать вопросы\n6)Выйти из программы\n\nВведите вариант:\n");
+		int i = getAnswer(6);
+		system("cls");
+		switch (i)
+		{
+		case 1:
+			que = openAndRecord(que);
+			break;
+		case 2:
+			que = EditTest(que);
+			break;
+		case 3:
+			SaveTest(que);
+			break;
+		case 4:
+			StartTesting(que);
+			break;
+		case 5:
+			showAll(que);
+			_getch();
+			break;
+		case 6:
+			flag = 1;
+			break;
+		}
+		if (flag == 1)
+			break;
+	}
+}
+
+int main()
+{
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
+	struct list que = { NULL,NULL,0 };
+	Menu(que);
+
+}
